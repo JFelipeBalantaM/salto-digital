@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Salto Digital</title>
+<style>
+:root{--bg:#0d1230;--bg2:#1b1f4b;--panel:#161b42;--line:#2f3873;--text:#f1f3ff;--mut:#b3bbea;--acc:#7a8cff;--teal:#35e0c2;--gold:#ffc857;--bad:#ff6b81;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{font-family:"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:1.125rem;color:var(--text);background:radial-gradient(1200px 700px at 80% -10%,var(--bg2),var(--bg));background-color:var(--bg);line-height:1.55}
+[hidden]{display:none!important}
+#app{max-width:1000px;margin:0 auto;padding:16px 16px 36px}
+#top{display:flex;justify-content:flex-end;margin-bottom:8px}
+h1{font-size:clamp(2.4rem,7vw,4rem);line-height:1.05;margin:0 0 12px;letter-spacing:-.02em;font-weight:800}
+h2{margin:0 0 16px;font-size:1.5rem;line-height:1.35}
+h3{margin:0 0 8px;font-size:1.25rem;color:var(--gold)}
+p{margin:0}
+.lead{color:var(--mut);font-size:1.3rem;max-width:62ch;margin-bottom:22px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-bottom:26px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px}
+.card b{display:block;margin-bottom:6px;color:var(--teal);font-size:1.2rem}
+.card p{color:var(--mut);font-size:1.05rem}
+.purpose{border-color:var(--gold);margin-bottom:16px}
+.purpose p{color:var(--text);font-size:1.15rem}
+.kb{display:flex;flex-wrap:wrap;gap:22px 44px;align-items:flex-end;justify-content:center;padding:22px 12px 16px;background:#0f1438;border-radius:14px;margin:12px 0 8px}
+.kg{text-align:center}
+.cap{margin-top:10px;font-size:1.05rem;font-weight:600}
+.keycap{display:flex;align-items:center;justify-content:center;height:58px;min-width:58px;border:1px solid var(--line);border-bottom-width:5px;border-radius:10px;background:#1a2052;color:#6a74b0;font-weight:700;font-size:1.4rem}
+.keycap.on{background:linear-gradient(180deg,#ffe29a,#ffc857);color:#3a2600;border-color:#b98a1f;box-shadow:0 0 18px rgba(255,200,87,.45)}
+.keycap.mv{background:linear-gradient(180deg,#8ff5e2,#35e0c2);color:#06322b;border-color:#1c9c9e;box-shadow:0 0 18px rgba(53,224,194,.4)}
+.keycap.sm{height:46px;min-width:46px;font-size:1.15rem;color:var(--text)}
+.space{width:min(300px,72vw);font-size:1.2rem}
+.arrows{display:grid;grid-template-columns:repeat(3,58px);gap:6px}
+.row{display:flex;gap:6px}
+.note{color:var(--mut);font-size:1rem;text-align:center}
+.btn{font:700 1.25rem inherit;color:#0d1230;background:linear-gradient(135deg,var(--teal),#7be9ff);border:0;border-radius:14px;padding:15px 44px;cursor:pointer;box-shadow:0 10px 30px rgba(53,224,194,.28);transition:transform .15s}
+.btn:hover{transform:translateY(-2px)}
+.btn.mini{font-size:1rem;padding:8px 18px;border-radius:10px;box-shadow:none;background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.mini:hover{border-color:var(--gold);color:var(--gold)}
+.btn:focus-visible,.opt:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.hud{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;justify-content:space-between;margin-bottom:10px;font-weight:600;font-size:1.15rem}
+.hud span{color:var(--mut);font-weight:500}
+#lives{color:var(--bad);font-size:1.6rem;letter-spacing:3px}
+.bar{height:7px;background:var(--line);border-radius:6px;overflow:hidden;margin-bottom:12px}
+#fill{height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--gold));transition:width .3s}
+.stage{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line);box-shadow:0 24px 60px rgba(0,0,0,.45)}
+canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;background:#0d1230}
+.hint{color:var(--mut);font-size:1rem;margin-top:10px;text-align:center}
+.modal{position:absolute;inset:0;background:rgba(8,10,30,.84);display:flex;align-items:center;justify-content:center;padding:12px;overflow:auto}
+.qcard{width:100%;max-width:760px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px;margin:auto}
+.meta{display:flex;justify-content:space-between;gap:10px;margin-bottom:10px;color:var(--mut);font-size:1rem}
+.tag{color:var(--gold);font-weight:700}
+.opt{display:block;width:100%;text-align:left;font:500 1.08rem inherit;color:var(--text);background:#10153a;border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-bottom:10px;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--acc);background:#1a2052}
+.opt.ok{border-color:var(--teal);background:rgba(53,224,194,.14)}
+.opt.no{border-color:var(--bad);background:rgba(255,107,129,.14)}
+.opt:disabled{cursor:default}
+#fb{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+#ft{color:var(--mut);margin-bottom:14px;font-size:1.05rem}
+#fr{font-weight:700;margin-bottom:4px;font-size:1.15rem}
+.stats{font-size:1.3rem;margin:10px 0 24px}
+@media(prefers-reduced-motion:reduce){.btn,#fill{transition:none}}
+</style>
+</head>
+<body>
+<div id="app">
+ <div id="top"><button class="btn mini" id="snd" aria-pressed="false">🔊 Sonido: activado</button></div>
+
+ <section id="start">
+  <h1>Salto Digital</h1>
+  <p class="lead">Un juego de plataformas para aprender, de forma práctica y sin presión, a resolver los problemas tecnológicos del día a día.</p>
+
+  <div class="card purpose">
+   <h3>Propósito del juego</h3>
+   <p>Que aprendas a reconocer y solucionar situaciones digitales cotidianas: correos y mensajes falsos, contraseñas y cuentas seguras, fallas del celular y del computador, redes WiFi y copias de seguridad. Cada pregunta termina con una explicación que puedes aplicar en la vida real.</p>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+   <b>Las teclas que usarás</b>
+   <div class="kb">
+    <div class="kg"><div class="arrows"><span></span><span class="keycap">↑</span><span></span><span class="keycap mv">←</span><span class="keycap">↓</span><span class="keycap mv">→</span></div><div class="cap">Moverte a izquierda y derecha</div></div>
+    <div class="kg"><div class="keycap on space">Espacio</div><div class="cap">Saltar</div></div>
+    <div class="kg"><div class="row"><span class="keycap sm">1</span><span class="keycap sm">2</span><span class="keycap sm">3</span><span class="keycap sm">4</span></div><div class="cap">Elegir respuesta (o usa el ratón)</div></div>
+   </div>
+   <p class="note">Las teclas de color son las que se usan en el juego.</p>
+  </div>
+
+  <div class="grid">
+   <div class="card"><b>Objetivo</b><p>Avanza hacia la derecha y sube por el mapa. Cada 10 valdosas aparece una pregunta con cuatro respuestas. Llega a la valdosa 150 y responde las 15 preguntas.</p></div>
+   <div class="card"><b>Vidas</b><p>Tienes 3 vidas. Pierdes una si caes al vacío o tocas un obstáculo. Equivocarte en una pregunta no te quita vidas: te explicamos la respuesta.</p></div>
+   <div class="card"><b>Obstáculos</b><p>Evita los pinchos rojos sobre las valdosas y, más adelante, los virus flotantes. Mientras avanzas, las valdosas se mueven más rápido y se hacen más pequeñas.</p></div>
+  </div>
+  <button class="btn" id="play">Play</button>
+ </section>
+
+ <section id="game" hidden>
+  <div class="hud">
+   <div id="lives" aria-label="Vidas"></div>
+   <div>Valdosa <span id="hp">0</span> de 150</div>
+   <div>Pregunta <span id="hq">0</span> de 15</div>
+   <button class="btn mini" id="rs">Reiniciar</button>
+  </div>
+  <div class="bar"><div id="fill"></div></div>
+  <div class="stage">
+   <canvas id="cv"></canvas>
+   <div class="modal" id="modal" hidden>
+    <div class="qcard">
+     <div class="meta"><span id="qn"></span><span class="tag" id="ql"></span></div>
+     <h2 id="qt"></h2>
+     <div id="opts"></div>
+     <div id="fb" hidden><p id="fr"></p><p id="ft"></p><button class="btn" id="next">Continuar</button></div>
+    </div>
+   </div>
+  </div>
+  <p class="hint">← → para moverte · Espacio para saltar · Evita los pinchos rojos y los virus · Las valdosas doradas activan una pregunta</p>
+ </section>
+
+ <section id="end" hidden>
+  <h1 id="et"></h1>
+  <p class="lead" id="ed"></p>
+  <p class="stats" id="es"></p>
+  <button class="btn" id="again">Jugar de nuevo</button>
+ </section>
+</div>
+
+<script>
+/* 20 preguntas en 3 niveles (7 básicas, 7 intermedias, 6 avanzadas). Cada partida usa 5 de cada nivel en orden aleatorio. La primera respuesta es la correcta; se mezclan al mostrarlas. */
+const Q=[
+["Tu computador tarda mucho en responder y tienes muchas ventanas abiertas. ¿Qué conviene hacer primero?",["Cerrar lo que no usas y reiniciar el equipo","Instalar un segundo antivirus","Desconectar el cable de internet","Cambiar el fondo de pantalla por uno más liviano"],"Liberar memoria cerrando programas y reiniciar resuelve la mayoría de las lentitudes sin gastar dinero."],
+["Tu celular dice que no hay espacio. ¿Cuál es el mejor primer paso?",["Ver qué ocupa más espacio y respaldar fotos y videos antes de borrar","Borrar aplicaciones del sistema que no reconoces","Restablecer el teléfono de fábrica","Quitar la tarjeta SIM"],"Primero identifica qué pesa más y guarda una copia de lo importante; borrar a ciegas puede costarte recuerdos."],
+["El WiFi aparece conectado pero una página no carga y otros dispositivos sí navegan. ¿Qué pruebas primero?",["Reiniciar tu dispositivo y volver a conectarte a la red","Restablecer de fábrica el router","Cambiar el operador de internet","Comprar un repetidor de señal"],"Si el resto de la red funciona, el problema suele estar en tu dispositivo; reconectarlo es lo menos invasivo."],
+["Borraste por error un documento importante del computador. ¿Qué haces?",["Dejar de guardar archivos en ese disco y buscar en la papelera o copias de seguridad","Formatear el disco para empezar limpio","Seguir trabajando normal y buscarlo después","Reinstalar el programa con el que lo creaste"],"Cada archivo nuevo puede sobrescribir lo borrado; detenerte y revisar papelera o respaldos aumenta tus opciones."],
+["Tu celular se mojó y se apagó. ¿Qué haces?",["Mantenerlo apagado, secarlo por fuera y no conectarlo al cargador hasta que esté seco","Encenderlo para ver si aún funciona","Usar un secador de aire caliente a máxima potencia","Conectarlo al cargador para que se reanime"],"Encender o cargar con humedad dentro puede causar un cortocircuito."],
+["La batería del celular dura cada vez menos. ¿Qué ayuda más sin gastar dinero?",["Revisar qué apps consumen más y limitar su uso en segundo plano","Cerrar todas las apps varias veces al día","Dejarlo cargando toda la noche siempre","Activar el modo avión durante el día"],"Los ajustes de batería muestran los culpables reales; cerrar apps a mano suele gastar más al reabrirlas."],
+["El celular te avisa que hay una actualización del sistema. ¿Qué es lo más recomendable?",["Instalarla pronto, con el equipo cargado y conectado a WiFi","Esperar un año a que otros la prueben","Ignorarla mientras todo funcione bien","Instalarla solo si el teléfono se pone lento"],"Muchas actualizaciones corrigen fallas de seguridad que los atacantes ya conocen."],
+["¿Qué contraseña protege mejor tus cuentas?",["Una frase larga distinta para cada cuenta, guardada en un gestor","Una contraseña muy compleja que repites en todo","Tu fecha de nacimiento con símbolos al final","La misma contraseña cambiando un número cada mes"],"La longitud y la unicidad importan más que la rareza: si una cuenta se filtra, las demás quedan a salvo."],
+["¿Qué significa activar la verificación en dos pasos?",["Además de la clave, confirmar con un código o aprobación en tu teléfono","Usar dos contraseñas distintas en la misma cuenta","Responder una pregunta secreta al iniciar sesión","Iniciar sesión desde dos dispositivos a la vez"],"Aunque alguien robe tu contraseña, necesita también tu segundo factor para entrar."],
+["Te llega un correo del banco que dice “cuenta bloqueada” e incluye un botón para verificarla. ¿Qué haces?",["No tocar el botón y entrar escribiendo tú mismo la dirección oficial del banco","Abrir el enlace, pero no escribir la clave completa","Responder el correo pidiendo más información","Reenviarlo a tus contactos como advertencia"],"Los enlaces de estos correos pueden imitar al banco a la perfección; entrar por tu cuenta evita la trampa."],
+["Un familiar escribe por WhatsApp desde un “número nuevo” y pide una transferencia urgente. ¿Qué es lo más prudente?",["Llamar a su número de siempre o verificar por otro medio","Enviar una cantidad pequeña mientras confirmas","Pedirle que te mande una foto suya","Guardar el número nuevo y esperar a que escriba de nuevo"],"Una foto o un nombre se pueden copiar; solo un canal independiente confirma su identidad."],
+["Una linterna gratuita te pide acceso a tus contactos y al micrófono. ¿Qué haces?",["Negar los permisos o buscar otra aplicación","Aceptar, pues viene de la tienda oficial","Aceptar solo el micrófono","Aceptar y desinstalarla luego"],"Una app solo debe pedir lo que necesita; permisos desproporcionados son una señal de alerta."],
+["En una videollamada todos te ven pero nadie te escucha. ¿Qué revisas primero?",["Que el micrófono correcto esté seleccionado y que el navegador tenga permiso para usarlo","Que la cámara tenga buena resolución","Que el volumen de tus parlantes esté alto","Que tu internet tenga más velocidad de bajada"],"Que te vean pero no te oigan apunta al dispositivo de entrada o a su permiso, no a la conexión."],
+["¿Cuál esquema de copias de seguridad es más sólido?",["Tres copias, en dos tipos de medio, una guardada fuera de casa","Una copia diaria en el mismo computador","Dos copias en dos carpetas del mismo disco","Una copia en una memoria USB conectada siempre"],"Varias copias en medios distintos y una en otro lugar te protegen de fallas, robos e incendios."],
+["Tu cuenta de correo ya no te deja entrar y tus amigos reciben mensajes extraños tuyos. ¿Qué haces?",["Recuperarla con la opción oficial, cambiar la clave, activar la verificación en dos pasos y cerrar sesiones ajenas","Crear una cuenta nueva y olvidarte de la vieja","Publicar en redes que no abran tus mensajes","Esperar unos días a que el problema se resuelva"],"Recuperar el control y cerrar sesiones abiertas corta el acceso; crear otra cuenta deja la vieja en manos ajenas."],
+["Estás en el WiFi abierto de una cafetería y debes revisar tu cuenta bancaria. ¿Cuál es la mejor decisión?",["Usar tus datos móviles o esperar a otra red de confianza","Confirmar que la página muestre el candado y continuar","Abrir una pestaña de incógnito","Entrar y cerrar sesión rápido"],"El candado cifra la conexión, pero en una red ajena puedes caer en un portal falso; los datos móviles evitan el riesgo."],
+["Mientras navegas aparece una ventana a pantalla completa: “Virus detectado, llama ya al servicio técnico”. ¿Qué haces?",["Cerrar el navegador (con el Administrador de tareas si hace falta) y analizar con tu antivirus","Llamar para comprobar si es verdad","Pagar la limpieza para estar tranquilo","Permitir que el técnico entre de forma remota"],"Esos avisos son anuncios diseñados para asustarte; tu antivirus real no te pide llamar a ningún número."],
+["Quieres comprar en una tienda en línea que no conoces. ¿Qué revisión es más fiable?",["Comprobar la dirección exacta, opiniones externas y un método de pago con protección","Que la página tenga un diseño muy profesional","Que los precios sean más bajos que en otras tiendas","Que la tienda tenga muchos seguidores en redes"],"El diseño y los seguidores se fabrican con facilidad; la reputación externa y un pago protegido sí te respaldan."],
+["Un compañero te envía por correo un archivo .zip que no esperabas. ¿Qué haces?",["Confirmar con él por otro medio antes de abrirlo","Abrirlo, pues el remitente es de confianza","Analizarlo con el antivirus y abrirlo si no marca nada","Reenviarlo a otros para que lo revisen"],"Su cuenta podría estar comprometida; un antivirus no detecta todas las amenazas nuevas."],
+["Un video muy compartido muestra a una figura pública diciendo algo escandaloso. ¿Cómo verificas si es real?",["Buscar el origen y contrastar con medios o fuentes oficiales","Fijarte en cuántas veces se compartió","Revisar si la calidad de imagen es buena","Preguntar en los comentarios si alguien lo cree"],"Los videos y audios falsos hechos con IA pueden ser convincentes; la popularidad no prueba nada, el origen sí."]
+];
+
+/* ===== Audio (sintetizado, sin archivos externos) ===== */
+let AC,mst,mus,fx,muted=false,mt=null,ms=0;
+function audio(){if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(!C)return;AC=new C();mst=AC.createGain();mst.connect(AC.destination);mus=AC.createGain();mus.gain.value=.5;mus.connect(mst);fx=AC.createGain();fx.gain.value=1;fx.connect(mst)}
+ if(AC.state==="suspended")AC.resume();applyMute()}
+function applyMute(){if(mst)mst.gain.value=muted?0:.22}
+function tone(f,d,ty,v,at,to,dst){if(!AC)return;const o=AC.createOscillator(),g=AC.createGain(),s=AC.currentTime+(at||0);o.type=ty||"sine";o.frequency.setValueAtTime(f,s);if(to)o.frequency.exponentialRampToValueAtTime(to,s+d);
+ g.gain.setValueAtTime(.0001,s);g.gain.exponentialRampToValueAtTime(v||.5,s+.01);g.gain.exponentialRampToValueAtTime(.0001,s+d);o.connect(g);g.connect(dst||fx);o.start(s);o.stop(s+d+.05)}
+const mf=m=>440*Math.pow(2,(m-69)/12);
+const sfx={
+ jump:()=>tone(320,.16,"sine",.7,0,760),
+ fall:()=>tone(520,.7,"sawtooth",.4,0,70),
+ hit:()=>{tone(220,.3,"square",.4,0,60);tone(120,.35,"sawtooth",.35,0,40)},
+ ask:()=>[660,880,1100].forEach((f,i)=>tone(f,.2,"triangle",.6,i*.12)),
+ good:()=>[523,659,784,1047].forEach((f,i)=>tone(f,.24,"triangle",.6,i*.09)),
+ bad:()=>{tone(311,.28,"sawtooth",.4,0,233);tone(233,.4,"sawtooth",.4,.22,155)}};
+const prog=[[57,60,64],[53,57,60],[48,52,55],[55,59,62]],pat=[0,1,2,1,2,1,2,1];
+function tick(){if(!AC)return;const c=prog[(ms>>3)&3],k=ms&7;
+ tone(mf(c[pat[k]]+12),.35,"triangle",.3,0,0,mus);
+ if(k===0)tone(mf(c[0]-12),1.3,"sine",.55,0,0,mus);
+ if(k===4)tone(mf(c[0]-5),.6,"sine",.3,0,0,mus);ms++}
+function startMusic(){stopMusic();ms=0;mt=setInterval(tick,300)}
+function stopMusic(){clearInterval(mt);mt=null}
+function updSnd(){$("snd").textContent=muted?"🔇 Sonido: desactivado":"🔊 Sonido: activado";$("snd").setAttribute("aria-pressed",muted)}
+
+/* ===== Juego ===== */
+const $=id=>document.getElementById(id),cv=$("cv"),cx=cv.getContext("2d"),W=960,H=540,PW=18,PH=46,N=150,NQ=15;
+const dpr=Math.min(2,window.devicePixelRatio||1);cv.width=W*dpr;cv.height=H*dpr;cx.setTransform(dpr,0,0,dpr,0,0);
+let P,O,QS,pl,best,asked,lives,okc,t,camX,camY,paused,running,last,jumpT=0,cur,answered,flash=0;
+const keys={},stars=Array.from({length:90},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.6+.3,d:Math.random()*.4+.1}));
+const sh=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
+function show(id){["start","game","end"].forEach(s=>$(s).hidden=s!==id)}
+function pickQs(){return [].concat(...[Q.slice(0,7),Q.slice(7,14),Q.slice(14)].map(g=>sh(g).slice(0,5)))}
+function build(){P=[];O=[];let x=120,y=430;
+ for(let i=0;i<=N;i++){const d=i/N,ck=i%10===0&&i>0,w=Math.round(i===0?170:ck?116:112-d*44);
+  if(i>0){x+=Math.round(152+d*50+Math.random()*14);y+=Math.round(Math.max(-55,Math.min(22,-18+(Math.random()-.5)*70)))}
+  let ty=0;if(i>2&&!ck&&Math.random()<.25+d*.75)ty=Math.random()<.6?1:2;
+  let sp=null;if(i>=12&&!ck&&Math.random()<.12+d*.45){const sw=Math.max(24,Math.round(w*.34));sp={off:Math.random()<.5?-w/2+4:w/2-4-sw,w:sw}}
+  P.push({i,x,y,bx:x,by:y,w,t:ty,ck,sp,a:ty===1?26+d*50:ty===2?18+d*16:0,s:.9+d*2,ph:Math.random()*6.28,dx:0,dy:0})}
+ for(let i=40;i<N;i++){const d=i/N;if(i%10===0||(i+1)%10===0)continue;
+  if(Math.random()<.1+d*.4){const a=P[i],b=P[i+1];O.push({x:(a.bx+b.bx)/2,by:(a.by+b.by)/2-45,a:34+d*30,s:1.2+d*1.5,ph:Math.random()*6.28,y:0})}}}
+function reset(){build();QS=pickQs();best=0;asked=0;lives=3;okc=0;t=0;paused=false;running=true;answered=false;flash=0;
+ for(const k in keys)keys[k]=false;
+ pl={x:P[0].x,y:P[0].y-PH,vx:0,vy:0,g:P[0],face:1};camX=0;camY=pl.y-H*.6;hud()}
+function hud(){$("lives").textContent="♥".repeat(lives)+"♡".repeat(3-lives);$("hp").textContent=best;$("hq").textContent=asked;$("fill").style.width=(best/N*100)+"%"}
+function respawn(){const p=P[best];pl.x=p.x;pl.y=p.y-PH;pl.vx=pl.vy=0;pl.g=p;camY=pl.y-H*.6;flash=1.3}
+function lose(){lives--;hud();if(lives<=0)finish(false);else respawn()}
+function finish(win){running=false;stopMusic();$("modal").hidden=true;show("end");
+ if(win)sfx.good();
+ $("et").textContent=win?"¡Lo lograste!":"Fin del juego";
+ $("ed").textContent=win?"Cruzaste las 150 valdosas y completaste todas las preguntas. Ya sabes resolver con criterio muchos problemas digitales de la vida diaria.":"Te quedaste sin vidas. Cada intento te enseña algo nuevo: vuelve a jugar y llega más lejos.";
+ $("es").textContent="Valdosa alcanzada: "+best+" de "+N+" · Respuestas correctas: "+okc+" de "+asked}
+function ask(n){paused=true;asked=n+1;hud();sfx.ask();const q=QS[n];
+ cur=sh(q[1].map((s,i)=>({s,ok:i===0})));answered=false;
+ $("qn").textContent="Pregunta "+(n+1)+" de "+NQ;$("ql").textContent=n<5?"Nivel básico":n<10?"Nivel intermedio":"Nivel avanzado";
+ $("qt").textContent=q[0];$("fb").hidden=true;$("opts").innerHTML="";
+ cur.forEach((o,i)=>{const b=document.createElement("button");b.className="opt";b.textContent=(i+1)+". "+o.s;b.onclick=()=>pick(i);$("opts").appendChild(b)});
+ $("ft").textContent=q[2];$("modal").hidden=false;$("opts").firstChild.focus()}
+function pick(i){if(answered)return;answered=true;const ok=cur[i].ok;
+ [...$("opts").children].forEach((b,k)=>{b.disabled=true;if(cur[k].ok)b.classList.add("ok");else if(k===i)b.classList.add("no")});
+ if(ok){okc++;sfx.good()}else sfx.bad();
+ $("fr").textContent=ok?"¡Correcto!":"No era esa, pero no pierdes ninguna vida.";$("fr").style.color=ok?"var(--teal)":"var(--gold)";
+ $("fb").hidden=false;$("next").focus()}
+$("next").onclick=()=>{$("modal").hidden=true;if(asked>=NQ)return finish(true);paused=false;last=performance.now()};
+function step(dt){t+=dt;
+ for(const p of P){const ox=p.x,oy=p.y;if(p.t===1)p.x=p.bx+Math.sin(t*p.s+p.ph)*p.a;else if(p.t===2)p.y=p.by+Math.sin(t*p.s+p.ph)*p.a;p.dx=p.x-ox;p.dy=p.y-oy}
+ for(const o of O)o.y=o.by+Math.sin(t*o.s+o.ph)*o.a;
+ const dir=(keys.ArrowRight?1:0)-(keys.ArrowLeft?1:0);pl.vx=dir*300;if(dir)pl.face=dir;
+ let g=pl.g;if(g){pl.x+=g.dx;pl.y+=g.dy}
+ if(jumpT>0){jumpT-=dt;if(g){pl.vy=-680;g=null;jumpT=0;sfx.jump()}}
+ pl.x=Math.max(16,pl.x+pl.vx*dt);
+ if(g){if(pl.x+PW/2<g.x-g.w/2||pl.x-PW/2>g.x+g.w/2)g=null;else pl.vy=0}
+ if(!g){const pb=pl.y+PH;pl.vy+=1800*dt;pl.y+=pl.vy*dt;const nb=pl.y+PH;
+  if(pl.vy>=0)for(const p of P){if(Math.abs(p.x-pl.x)>p.w)continue;
+   if(pb<=p.y-p.dy+6&&nb>=p.y&&pl.x+PW/2>p.x-p.w/2&&pl.x-PW/2<p.x+p.w/2){g=p;pl.y=p.y-PH;pl.vy=0;
+    if(p.i>best){best=p.i;hud()}
+    if(Math.floor(p.i/10)>asked){pl.g=g;ask(asked);return}break}}}
+ pl.g=g;
+ if(flash<=0){const x0=pl.x-PW/2+2,x1=pl.x+PW/2-2,y0=pl.y+6,y1=pl.y+PH;let hit=false;
+  for(const p of P){if(!p.sp||Math.abs(p.x-pl.x)>p.w)continue;const sx=p.x+p.sp.off;if(x1>sx&&x0<sx+p.sp.w&&y1>p.y-14&&y0<p.y)hit=true}
+  for(const o of O)if(Math.abs(o.x-pl.x)<60&&Math.hypot(o.x-pl.x,o.y-(pl.y+PH/2))<24)hit=true;
+  if(hit){sfx.hit();lose();return}}
+ camX+=(Math.max(0,pl.x-W*.38)-camX)*Math.min(1,dt*6);
+ const ty=pl.y-H*.6;if(g||ty<camY)camY+=(ty-camY)*Math.min(1,dt*4);
+ if(pl.y>camY+H+60){sfx.fall();lose()}}
+function rr(x,y,w,h,r){cx.beginPath();cx.roundRect(x,y,w,h,r)}
+function draw(){
+ const gr=cx.createLinearGradient(0,0,0,H);gr.addColorStop(0,"#141a4a");gr.addColorStop(1,"#070a22");cx.fillStyle=gr;cx.fillRect(0,0,W,H);
+ cx.fillStyle="#cfd6ff";for(const s of stars){const sx=((s.x-camX*s.d)%W+W)%W,sy=((s.y-camY*s.d)%H+H)%H;cx.globalAlpha=.25+s.d;cx.fillRect(sx,sy,s.r,s.r)}cx.globalAlpha=1;
+ const vg=cx.createLinearGradient(0,H-110,0,H);vg.addColorStop(0,"rgba(122,140,255,0)");vg.addColorStop(1,"rgba(122,140,255,.22)");cx.fillStyle=vg;cx.fillRect(0,H-110,W,110);
+ cx.save();cx.translate(-camX,-camY);
+ for(const p of P){if(p.x+p.w<camX-20||p.x-p.w>camX+W+20)continue;
+  const c=p.ck?["#ffd97d","#e0a030"]:p.t?["#5af0d6","#1c9c9e"]:["#8c9bff","#4a5bd6"];
+  const g2=cx.createLinearGradient(0,p.y,0,p.y+16);g2.addColorStop(0,c[0]);g2.addColorStop(1,c[1]);
+  cx.shadowColor=c[0];cx.shadowBlur=14;cx.fillStyle=g2;rr(p.x-p.w/2,p.y,p.w,16,6);cx.fill();cx.shadowBlur=0;
+  if(p.ck){cx.fillStyle="#3a2600";cx.font="bold 13px Segoe UI,Arial";cx.textAlign="center";cx.fillText("?",p.x,p.y+13)}
+  if(p.sp){const sx=p.x+p.sp.off,n=Math.max(2,Math.round(p.sp.w/12)),tw=p.sp.w/n;cx.fillStyle="#ff6b81";cx.shadowColor="#ff6b81";cx.shadowBlur=10;cx.beginPath();
+   for(let k=0;k<n;k++){cx.moveTo(sx+k*tw,p.y+1);cx.lineTo(sx+(k+.5)*tw,p.y-14);cx.lineTo(sx+(k+1)*tw,p.y+1)}cx.fill();cx.shadowBlur=0}}
+ for(const o of O){if(o.x<camX-40||o.x>camX+W+40)continue;
+  cx.shadowColor="#ff6b81";cx.shadowBlur=16;cx.strokeStyle="#ff6b81";cx.lineWidth=2.5;cx.beginPath();
+  for(let k=0;k<8;k++){const a=k*.785+t*2;cx.moveTo(o.x+Math.cos(a)*9,o.y+Math.sin(a)*9);cx.lineTo(o.x+Math.cos(a)*16,o.y+Math.sin(a)*16)}cx.stroke();
+  cx.fillStyle="#ff6b81";cx.beginPath();cx.arc(o.x,o.y,10,0,6.3);cx.fill();cx.shadowBlur=0;cx.fillStyle="#2a0a14";cx.beginPath();cx.arc(o.x,o.y,4,0,6.3);cx.fill()}
+ const mv=Math.abs(pl.vx)>1&&pl.g,sw=mv?Math.sin(t*14)*8:0,ar=!pl.g;
+ if(flash>0)cx.globalAlpha=.5+.5*Math.sin(flash*40);
+ cx.strokeStyle="#fff";cx.fillStyle="#fff";cx.lineWidth=3.2;cx.lineCap="round";cx.shadowColor="#7a8cff";cx.shadowBlur=10;
+ const hx=pl.x,hy=pl.y;cx.beginPath();cx.arc(hx,hy+8,7,0,6.3);cx.fill();
+ cx.beginPath();cx.moveTo(hx,hy+15);cx.lineTo(hx,hy+31);
+ cx.moveTo(hx,hy+19);cx.lineTo(hx+(ar?10*pl.face:sw),hy+(ar?10:28));cx.moveTo(hx,hy+19);cx.lineTo(hx-(ar?10*pl.face:sw),hy+(ar?10:28));
+ cx.moveTo(hx,hy+31);cx.lineTo(hx+(ar?8:sw*.9),hy+PH);cx.moveTo(hx,hy+31);cx.lineTo(hx-(ar?4:sw*.9),hy+PH-(ar?6:0));cx.stroke();
+ cx.shadowBlur=0;cx.globalAlpha=1;cx.restore()}
+function loop(now){requestAnimationFrame(loop);if(!running)return;const dt=Math.min(.033,(now-(last||now))/1000);last=now;
+ if(!paused){if(flash>0)flash-=dt;step(dt)}draw()}
+addEventListener("keydown",e=>{
+ if(running&&!paused&&["Space","ArrowLeft","ArrowRight"].includes(e.code)){e.preventDefault();keys[e.code]=true;if(e.code==="Space"&&!e.repeat)jumpT=.15}
+ if(paused&&!$("modal").hidden&&!answered&&/^[1-4]$/.test(e.key))pick(+e.key-1)});
+addEventListener("keyup",e=>{keys[e.code]=false});
+addEventListener("blur",()=>{for(const k in keys)keys[k]=false});
+function begin(){audio();reset();$("modal").hidden=true;show("game");last=0;startMusic()}
+$("play").onclick=begin;$("again").onclick=begin;
+$("rs").onclick=function(){this.blur();begin()};
+$("snd").onclick=function(){muted=!muted;audio();applyMute();updSnd();this.blur()};
+updSnd();requestAnimationFrame(loop);
+</script>
+</body>
+</html>
